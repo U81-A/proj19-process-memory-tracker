@@ -1,3 +1,7 @@
+//
+// Created by XI Ruiling on 2021/5/24.
+//
+
 #include <iostream>
 #include <vector>
 #include <io.h>
@@ -23,84 +27,83 @@ struct process {
     int memory;
 };
 
-void listFiles(const char * dir);
-void scanDirectorFromPath(const char* path);
+void listFiles(const char *dir);
+
+void scanDirectorFromPath(const char *path);
+
 bool isNum(string str);
-void user_call(vector<process> origin_proc_list);
+
+void user_call();
 
 vector<process> process_sort(vector<process> list, string target, bool direction);
+
 vector<process> process_top(vector<process> list, int num);
+
 vector<process> process_specific(vector<process> list, int pid);
 
 vector<process> fetchProcessList();
+
 string _commend;
-vector <string> dirs;
-vector <string> process_dirs;
-vector <process> process_list;
+vector<string> dirs;
+vector<string> process_dirs;
+vector<process> process_list;
 
 #include <sstream>
 
-bool com_pid_pos(const process &p1, const process &p2){
+bool com_pid_pos(const process &p1, const process &p2) {
     return p1.pid > p2.pid;
 }
 
-bool com_pid_neg(const process &p1, const process &p2){
+bool com_pid_neg(const process &p1, const process &p2) {
     return p1.pid < p2.pid;
 }
 
-bool com_mem_pos(const process &p1, const process &p2){
+bool com_mem_pos(const process &p1, const process &p2) {
     return p1.memory > p2.memory;
 }
 
-bool com_mem_neg(const process &p1, const process &p2){
+bool com_mem_neg(const process &p1, const process &p2) {
     return p1.memory < p2.memory;
 }
 
-vector<process> process_sort(vector<process> list, string target, bool direction){
-    if (target=="pid"){
-        if (direction){
+vector<process> process_sort(vector<process> list, string target, bool direction) {
+    if (target == "pid") {
+        if (direction) {
             sort(list.begin(), list.end(), com_pid_pos);
-        }else{
+        } else {
             sort(list.begin(), list.end(), com_pid_neg);
         }
-    }
-    else if (target=="memory"){
-        if (direction){
+    } else if (target == "memory") {
+        if (direction) {
             sort(list.begin(), list.end(), com_mem_pos);
-        }else{
+        } else {
             sort(list.begin(), list.end(), com_mem_neg);
         }
     }
     return list;
 }
 
-vector<process> process_top(vector<process> list, int num){
+vector<process> process_top(vector<process> list, int num) {
     int count = 0;
-    for (vector<process>::iterator it = list.begin(); it!=list.end();){
+    for (vector<process>::iterator it = list.begin(); it != list.end();) {
         count++;
-        if (count > num)
-        {
+        if (count > num) {
             /* code */
             it = list.erase(it);
-        }
-        else
-        {
+        } else {
             it++;
         }
     }
     return list;
 }
 
-vector<process> process_specific(vector<process> list, int pid){
+vector<process> process_specific(vector<process> list, int pid) {
     int count = 0;
-    for (vector<process>::iterator it = list.begin(); it!=list.end();){
-        if (list[count].pid!=pid)
-        {
+    for (vector<process>::iterator it = list.begin(); it != list.end();) {
+        if (list[count].pid != pid) {
             /* code */
             it = list.erase(it);
-        }
-        else
-        {
+        } else {
             it++;
         }
         count++;
@@ -108,7 +111,7 @@ vector<process> process_specific(vector<process> list, int pid){
     return list;
 }
 
-vector<process> fetchProcessList(){
+vector<process> fetchProcessList() {
 
 
 //    _commend = "cat /proc";
@@ -122,28 +125,28 @@ vector<process> fetchProcessList(){
     scanDirectorFromPath(tar_dir);
     // cout << "--------- dirs ---------" << endl;
 //    for (auto a : dirs) cout << a << endl;
-    for (int i = 0;i<dirs.size();++i){
+    for (int i = 0; i < dirs.size(); ++i) {
         // cout << dirs[i] << endl;
         if (isNum(dirs[i])) {
 //            cout << "This is a folder for process " << dirs[i] << endl;
             process_dirs.push_back(dirs[i]);
-        }else {
+        } else {
 //            cout << "This is not a process " << endl;
         }
     }
 
     ifstream infile;
 
-    for (int i = 0;i<process_dirs.size();i++){
+    for (int i = 0; i < process_dirs.size(); i++) {
 
         string pid = process_dirs[i];
-        infile.open(("/proc/"+pid+"/statm").c_str(), ios::in);
+        infile.open(("/proc/" + pid + "/statm").c_str(), ios::in);
 
-        if(!infile.is_open ())
+        if (!infile.is_open())
             cout << "Open file failure" << endl;
 
         string temp;
-        while(getline(infile,temp)){
+        while (getline(infile, temp)) {
             istringstream str(temp);
             string data;
             vector<string> datas;
@@ -173,13 +176,13 @@ vector<process> fetchProcessList(){
     // if (proc_output.is_open()) {
     //     for (int i = 0;i<process_list.size();++i) {
     //         setlocale(LC_ALL,"en_US.UTF-8");
-    //         // cout << process_list[i].pid << " " << process_list[i].memory << endl;
-    //         proc_output<<setw(10)<<process_list[i].pid<<setw(10)<<process_list[i].memory<<endl;
+    //         // cout<<setw(10)<<process_list[i].pid<<setw(10)<<process_list[i].memory<<endl;
+    //         cout<<setw(10)<<process_list[i].pid<<setw(10)<<process_list[i].memory<<endl;
     //     }
     //     proc_output.close();
     // } else cout << "Unable to open the file";
 
-    
+
 
 //    _commend = "cat /proc/PID/status";
 //    system("cat /proc/PID/status");
@@ -188,8 +191,7 @@ vector<process> fetchProcessList(){
 }
 
 
-void listFiles(const char * dir)
-{
+void listFiles(const char *dir) {
     /*intptr_t handle;
     _finddata_t findData;
     handle = _findfirst(dir, &findData);    // 查找目录中的第一个文件
@@ -217,26 +219,24 @@ void listFiles(const char * dir)
     _findclose(handle);    // 关闭搜索句柄*/
 }
 
-void scanDirectorFromPath(const char* path)
-{
+void scanDirectorFromPath(const char *path) {
     DIR *dir;
     dir = opendir(path);
-    if(dir == NULL){
-        cout<<"Open Dir failed!"<<endl;
+    if (dir == NULL) {
+        cout << "Open Dir failed!" << endl;
         return;
     }
     struct dirent *dirent_;
-    while(dirent_ = readdir(dir))
-    {
-        string dir_name = dirent_ ->d_name;
+    while (dirent_ = readdir(dir)) {
+        string dir_name = dirent_->d_name;
         //ignore . or .. file
-        if(dir_name  == "." || dir_name  == ".."){
+        if (dir_name == "." || dir_name == "..") {
             continue;
-        }else if (dir_name .find(".cms") != string::npos){
+        } else if (dir_name.find(".cms") != string::npos) {
             size_t start_pos = dir_name.find_first_of("_");
-            int appID = atoi(dir_name.substr(0,start_pos ).c_str());
+            int appID = atoi(dir_name.substr(0, start_pos).c_str());
             size_t end_pos = dir_name.find_last_of("_");
-            int orgID = atoi(dir_name.substr(start_pos +1,end_pos ).c_str());
+            int orgID = atoi(dir_name.substr(start_pos + 1, end_pos).c_str());
             // cout<< "CMS File's appID:"<<appID <<endl;
             // cout<< "CMS File's orgID:"<<orgID <<endl;
         }
@@ -247,17 +247,12 @@ void scanDirectorFromPath(const char* path)
     }
 }
 
-bool isNum(string str)
-{
-    for (int i = 0; i < str.size(); i++)
-    {
-        int tmp = (int)str[i];
-        if (tmp >= 48 && tmp <= 57)
-        {
+bool isNum(string str) {
+    for (int i = 0; i < str.size(); i++) {
+        int tmp = (int) str[i];
+        if (tmp >= 48 && tmp <= 57) {
             continue;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -265,131 +260,106 @@ bool isNum(string str)
 }
 
 
-
 int main() {
     vector<process> origin_proc_list = fetchProcessList();
-    user_call(origin_proc_list);
-    cout<<"end with failure"<<endl;
+    user_call();
+    cout << "end with failure" << endl;
 }
 
-void user_call(vector<process> origin_proc_list) {
-    while (true)
-    {
+void user_call() {
+    while (true) {
         char mode;
-        cout << "Input [a] or [b] or [c]:\n[a]:\tspecific\n[b]:\tsorted\n[c]:\tfind the top N memory cosumed PID"<< endl;
+        cout << "Input [a] or [b] or [c]:\n[a]:\tspecific\n[b]:\tsorted\n[c]:\tfind the top N memory cosumed PID\n"
+             << endl;
         cin >> mode;
         vector<process> origin;
         vector<process> result;
-        if (mode == 'a') 
-        {
+        if (mode == 'a') {
             int pid;
-            cout << "Enter specific mode. Pls input the PID: "<<endl;
+            cout << "Enter specific mode. Pls input the PID: " << endl;
             cin >> pid;
-            while (true)
-            {
-                system("CLS");
+            while (true) {
                 origin = fetchProcessList();
                 result = process_specific(origin, pid);
-                
-                for (int i = 0;i<result.size();++i) {
-                    setlocale(LC_ALL,"en_US.UTF-8");
-                    cout << process_list[i].pid << " " << process_list[i].memory << endl;
+                system("CLS");
+                for (int i = 0; i < result.size(); ++i) {
+                    cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
                 }
                 usleep(1000000);
             }
-            break; 
-        } else if (mode == 'b') 
-        {
-            /* code */ 
+            break;
+        } else if (mode == 'b') {
+            /* code */
             char order;
-            cout << "Enter sorted mode. Pls select the order:\n[a]:\t Ascend PID\n[b]:\tDescend PID\n[c]:\tAscend memory consuming\n[d]:\tDescend memory consuming"<<endl;
+            cout
+                    << "Enter sorted mode. Pls select the order:\n[a]:\t Ascend PID\n[b]:\tDescend PID\n[c]:\tAscend memory consuming\n[d]:\tDescend memory consuming"
+                    << endl;
             cin >> order;
-            while (true)
-            {
+            while (true) {
                 /* code */
                 if (order == 'a') {
-                    while (true)
-                    {
-                        system("CLS");
+                    while (true) {
                         origin = fetchProcessList();
-                        result = process_sort(origin,"pid",true);
-                        
-                        for (int i = 0;i<result.size();++i) {
-                            setlocale(LC_ALL,"en_US.UTF-8");
-                            cout << process_list[i].pid << " " << process_list[i].memory << endl;
+                        result = process_sort(origin, "pid", true);
+                        system("CLS");
+                        for (int i = 0; i < result.size(); ++i) {
+                            cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
                         }
                         usleep(1000000);
                     }
                     break;
-                } else if (order == 'b')
-                {
+                } else if (order == 'b') {
                     /* code */
-                    while (true)
-                    {
-                        system("CLS");
+                    while (true) {
                         origin = fetchProcessList();
-                        result = process_sort(origin,"pid",false);
-                        
-                        for (int i = 0;i<result.size();++i) {
-                            setlocale(LC_ALL,"en_US.UTF-8");
-                            cout << process_list[i].pid << " " << process_list[i].memory << endl;
-                        
-                        }usleep(1000000);
-                    }
-                    break;
-                } else if (order == 'c')
-                {
-                    /* code */
-                    while (true)
-                    {
+                        result = process_sort(origin, "pid", false);
                         system("CLS");
-                        origin = fetchProcessList();
-                        result = process_sort(origin,"memory",true);
-
-                        for (int i = 0;i<result.size();++i) {
-                            setlocale(LC_ALL,"en_US.UTF-8");
-                            cout << process_list[i].pid << " " << process_list[i].memory << endl;
+                        for (int i = 0; i < result.size(); ++i) {
+                            cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
                         }
                         usleep(1000000);
                     }
                     break;
-                }else if (order == 'd')
-                {
+                } else if (order == 'c') {
                     /* code */
-                    while (true)
-                    {
-                        system("CLS");
+                    while (true) {
                         origin = fetchProcessList();
-                        result = process_sort(origin,"memory",false);
-
-                        for (int i = 0;i<result.size();++i) {
-                            setlocale(LC_ALL,"en_US.UTF-8");
-                            cout << process_list[i].pid << " " << process_list[i].memory << endl;
+                        result = process_sort(origin, "memory", true);
+                        system("CLS");
+                        for (int i = 0; i < result.size(); ++i) {
+                            cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
                         }
                         usleep(1000000);
                     }
                     break;
-                } else 
-                {
+                } else if (order == 'd') {
+                    /* code */
+                    while (true) {
+                        origin = fetchProcessList();
+                        result = process_sort(origin, "memory", false);
+                        system("CLS");
+                        for (int i = 0; i < result.size(); ++i) {
+                            cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
+                        }
+                        usleep(1000000);
+                    }
+                    break;
+                } else {
                     cout << "Wrong input. Pls input again.";
                 }
             }
             break;
-        } else if (mode == 'c')
-        {
+        } else if (mode == 'c') {
             /* code */
             int num;
             cout << "Provide top N memory consuming thread. Input N:" << endl;
             cin >> num;
-            while (true)
-            {
-                system("CLS");
+            while (true) {
                 origin = fetchProcessList();
-                result = process_top(origin,num);
-
-                for (int i = 0;i<result.size();++i) {
-                    setlocale(LC_ALL,"en_US.UTF-8");
-                    cout << process_list[i].pid << " " << process_list[i].memory << endl;
+                result = process_top(origin, num);
+                system("CLS");
+                for (int i = 0; i < result.size(); ++i) {
+                    cout << setw(10) << process_list[i].pid << setw(10) << process_list[i].memory << endl;
                 }
                 usleep(1000000);
             }
@@ -398,8 +368,4 @@ void user_call(vector<process> origin_proc_list) {
             cout << "Wrong input. Pls input again.";
         }
     }
-    
-    
-    
-    
 }
